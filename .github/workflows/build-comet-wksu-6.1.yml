@@ -1,0 +1,91 @@
+name: "Comet (Pixel 9 Pro Fold) - WKSU 6.1 + ZeroMount"
+
+# Single-sublevel caller for the Pixel 9 Pro Fold (codename: comet).
+#
+# This is a THIN WRAPPER. It does NOT reimplement the build. It reuses
+# Super-Builders' own tested reusable workflows:
+#   1. cache-dependencies.yml  -> clones AnyKernel3 (WildKernels gki-2.0),
+#      kernel_patches, SukiSU_patch, and the repo tool, uploads them as artifacts.
+#   2. build-wksu.yml          -> downloads those artifacts, syncs Google's
+#      common-android14-6.1 source, applies the android14-6.1/WildKSU patch
+#      stack (50_susfs -> 51_enhanced_susfs -> 70_ksu_safety -> 60_zeromount),
+#      merges defconfig.fragment, builds the GKI Image, and packages AnyKernel3.
+#
+# REQUIREMENT: this file must live inside YOUR FORK of Enginex0/Super-Builders,
+# at .github/workflows/build-comet-wksu-6.1.yml. The `uses: ./...` lines below
+# reference reusable workflows and the android14-6.1 patch tree that only exist
+# in that repo. It will NOT work dropped into an empty/unrelated repo.
+#
+# WHY a custom caller instead of the stock "Android 14 - Kernel 6.1" workflow:
+# the stock one fans out a 21-sublevel matrix (wastes ~21x CI minutes and gives
+# you 21 zips to sort through). This builds exactly the one sublevel your Fold
+# runs. Pinned to WKSU to match the WildKSU userspace manager on your device.
+
+permissions:
+  contents: write
+  actions: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      sub_level:
+        description: "Your kernel SUBLEVEL. Run `adb shell uname -r`; for 6.1.134-android14-... enter 134. MUST match your device."
+        type: string
+        required: true
+      os_patch_level:
+        description: "AOSP common branch month. Verify it exists first: git ls-remote https://android.googlesource.com/kernel/common | grep android14-6.1-<MONTH>. Pick the month at/just below your security patch."
+        type: string
+        required: true
+        default: "2025-09"
+      device_codename:
+        description: "Leave 'generic' for the first build. uname spoofing does not affect whether it boots, and no comet profile exists yet."
+        type: string
+        default: "generic"
+      add_susfs:
+        description: "Enhanced SUSFS hiding (the part doing the heavy lifting for Play Integrity / banking)."
+        type: boolean
+        default: true
+      add_zeromount:
+        description: "ZeroMount mountless VFS engine (the whole reason for building from source)."
+        type: boolean
+        default: true
+      add_zram:
+        description: "ZRAM with LZ4K/LZ4KD."
+        type: boolean
+        default: true
+      add_bbg:
+        description: "Baseband Guard."
+        type: boolean
+        default: true
+      add_overlayfs_support:
+        description: "CONFIG_TMPFS_XATTR + POSIX ACL (overlayfs fallback support)."
+        type: boolean
+        default: true
+      add_kpm:
+        description: "KPM (SukiSU/ReSukiSU only; leave off for WKSU)."
+        type: boolean
+        default: false
+
+jobs:
+  download-dependencies:
+    uses: ./.github/workflows/cache-dependencies.yml
+    permissions:
+      contents: read
+      actions: write
+
+  build-comet-wksu:
+    needs: [download-dependencies]
+    uses: ./.github/workflows/build-wksu.yml
+    with:
+      android_version: android14
+      kernel_version: "6.1"
+      sub_level: ${{ inputs.sub_level }}
+      os_patch_level: ${{ inputs.os_patch_level }}
+      add_susfs: ${{ inputs.add_susfs }}
+      add_zeromount: ${{ inputs.add_zeromount }}
+      add_zram: ${{ inputs.add_zram }}
+      add_bbg: ${{ inputs.add_bbg }}
+      add_overlayfs_support: ${{ inputs.add_overlayfs_support }}
+      add_kpm: ${{ inputs.add_kpm }}
+      sukisu_commit: ""
+      device_codename: ${{ inputs.device_codename }}
