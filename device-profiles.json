@@ -29,6 +29,21 @@
         "build_host": "build-host",
         "compiler_info": "Android (11368308, +pgo, +bolt, +lto, +mlgo, based on r510928) clang version 18.0.0"
       }
+    },
+    "comet": {
+      "name": "Pixel 9 Pro Fold",
+      "codename": "comet",
+      "android_version": "android14",
+      "kernel_version": "6.1",
+      "sub_level": "145",
+      "os_patch_level": "2025-09",
+      "stock_kernel": {
+        "release": "-android14-11-gfa1d6308d1fe-ab14691759",
+        "version_string": "#1 SMP PREEMPT Fri Jan  9 16:33:46 UTC 2026",
+        "build_user": "build-user",
+        "build_host": "build-host",
+        "compiler_info": "Android (10087095, +pgo, +bolt, +lto, -mlgo, based on r487747c) clang version 17.0.2 (https://android.googlesource.com/toolchain/llvm-project d9f89f4d16663d5012e5c09495f3b30ece3d2362), LLD 17.0.2"
+      }
     }
   },
   "_template": {
