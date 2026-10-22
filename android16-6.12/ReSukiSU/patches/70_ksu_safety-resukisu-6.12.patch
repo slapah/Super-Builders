@@ -1,4 +1,4 @@
-diff -ruN /mnt/external/claudetest-gki-build/patch-workspace/ksu-variants/resukisu/clean/kernel/supercalls.c /mnt/external/claudetest-gki-build/patch-workspace/ksu-variants/resukisu/work/kernel/supercalls.c
+diff -ruN /mnt/external/gki-build/patch-workspace/ksu-variants/resukisu/clean/kernel/supercalls.c /mnt/external/gki-build/patch-workspace/ksu-variants/resukisu/work/kernel/supercalls.c
 --- a/kernel/supercalls.c	2026-03-02 18:36:41.474740927 +0100
 +++ b/kernel/supercalls.c	2026-03-03 19:24:39.884354889 +0100
 @@ -365,7 +365,7 @@
